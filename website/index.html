@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f3">
+  <meta name="description" content="Meet Notesy: a calm notes workspace with a visual canvas for the ideas that connect.">
+  <title>Notesy — Notes with room to move</title>
+  <link rel="icon" type="image/png" href="assets/notesy-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar glass">
+    <a class="brand" href="#top" aria-label="Notesy home"><img src="assets/notesy-icon.png" alt=""><span>Notesy</span></a>
+    <nav aria-label="Main navigation"><a href="#about">A calmer kind of notes</a><a href="#demo">Explore the canvas</a></nav>
+    <a class="top-cta" href="#demo">Try the demo <span>↓</span></a>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><i></i> NOTES, WITH SPACE TO MOVE</div>
+        <h1>Your notes.<br>Your <em>own little world.</em></h1>
+        <p>Keep everyday notes close. Spread bigger ideas out on a canvas. Follow the connections wherever they lead.</p>
+        <div class="hero-actions"><a class="button button-dark" href="#demo">Explore Notesy <span>↓</span></a><span class="quiet-note">A native Mac app for collecting your thoughts.</span></div>
+        <div class="hero-foot"><span class="sparkle">✳</span><span>Simple notes meet a canvas that thinks differently.</span></div>
+      </div>
+      <div class="hero-product">
+        <div class="hero-glow"></div>
+        <div class="screenshot-frame glass"><img src="assets/notesy-workspace.png" alt="Notesy for Mac showing folders and notes beside a dotted canvas with connected note cards"></div>
+        <div class="screenshot-label glass"><span class="live-dot"></span> Notes on the left. Ideas in motion on the right.</div>
+      </div>
+    </section>
+
+    <div class="ticker"><div>FOLDERS FOR THE DAY-TO-DAY <b>·</b> A CANVAS FOR THE BIGGER PICTURE <b>·</b> NOTES THAT CAN CONNECT <b>·</b> YOUR WORKSPACE, YOUR WAY <b>·</b> FOLDERS FOR THE DAY-TO-DAY <b>·</b> A CANVAS FOR THE BIGGER PICTURE <b>·</b></div></div>
+
+    <section class="intro section-wrap" id="about"><div class="section-kicker">A WORKSPACE THAT OPENS UP</div><div class="intro-grid"><h2>From a quick note<br>to the <span>whole idea.</span></h2><div><p>Notesy brings familiar notes and a flexible canvas together in one quiet workspace.</p><p class="muted">Keep your notes in folders. Give a thought its own canvas. Arrange cards, place free-floating arrows wherever they help, and zoom out when you need a little perspective.</p></div></div></section>
+
+    <section class="play-section section-wrap" id="demo">
+      <div class="play-heading"><div><div class="section-kicker">TAKE THE WHEEL</div><h2>A canvas of<br><span>your own.</span></h2></div><p>Click around the workspace.<br>Try a new card or make a connection.</p></div>
+      <div class="demo-window" id="demo-window">
+        <button class="toolbar-reveal" id="restore-toolbar" aria-label="Restore toolbar">☰ &nbsp; Show toolbar</button>
+        <div class="window-toolbar">
+          <div class="traffic"><i></i><i></i><i></i></div>
+          <div class="toolbar-leading">
+            <button class="tool-button" id="toggle-sidebar" title="Show or hide folders" aria-label="Show or hide folders"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M8 4v12"/></svg></button>
+            <button class="tool-button" id="add-folder" title="New folder" aria-label="New folder"><svg viewBox="0 0 20 20"><path d="M2.8 6.5h5l1.5 1.7h8a1 1 0 0 1 1 1v5.5a1.5 1.5 0 0 1-1.5 1.5H4a1.5 1.5 0 0 1-1.5-1.5V6.5Z"/><path d="M14.5 10.5v4M12.5 12.5h4"/></svg></button>
+            <button class="tool-button" title="More options" aria-label="More options"><svg viewBox="0 0 20 20"><circle cx="5" cy="10" r=".8"/><circle cx="10" cy="10" r=".8"/><circle cx="15" cy="10" r=".8"/></svg></button>
+            <strong class="window-heading" id="view-title">Notes</strong>
+          </div>
+          <div class="toolbar-center">
+            <button class="tool-button" id="new-note" title="New note" aria-label="New note"><svg viewBox="0 0 20 20"><path d="M11 4H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V9M11 9l6-6M13 3h4v4"/></svg></button>
+            <button class="tool-button" id="format-text" title="Format selected note" aria-label="Format note"><b>Aa</b></button>
+            <button class="tool-button" id="add-checklist" title="Add checklist item" aria-label="Add checklist item"><svg viewBox="0 0 20 20"><circle cx="5" cy="6" r="1.8"/><path d="m4.2 6  .6.7 1.2-1.4M9 6h7M5 12a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6ZM9 14h7"/></svg></button>
+            <button class="tool-button" id="add-table" title="Insert a small table" aria-label="Insert table"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="1.5"/><path d="M3 8h14M8 8v8M13 8v8"/></svg></button>
+            <button class="tool-button" id="attach-file" title="Add an attachment" aria-label="Add attachment"><svg viewBox="0 0 20 20"><path d="m12.5 6-5.7 5.7a2.2 2.2 0 0 0 3.1 3.1l6-6a3.3 3.3 0 0 0-4.7-4.7l-6.5 6.5"/></svg></button>
+            <button class="tool-button" id="add-card" title="Add a canvas card" aria-label="Add canvas card"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M10 6v8M6 10h8"/></svg></button>
+            <button class="tool-button" id="connect-cards" title="Draw a free-floating arrow" aria-label="Draw a free-floating arrow" aria-pressed="false"><svg viewBox="0 0 20 20"><path d="M3 15 15.5 4.5M9 4h7v7"/><path d="M4 4h2M4 4v2"/></svg></button>
+            <button class="tool-button" id="zoom-out" title="Zoom out" aria-label="Zoom out"><svg viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4M6 8.5h5"/></svg></button>
+            <button class="tool-button" id="zoom-in" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4M6 8.5h5M8.5 6v5"/></svg></button>
+            <button class="tool-button" id="share-note" title="Share this note" aria-label="Share note"><svg viewBox="0 0 20 20"><path d="M10 13V3m0 0L6.5 6.5M10 3l3.5 3.5M4 10v6h12v-6"/></svg></button>
+            <button class="tool-button" id="delete-card" title="Remove a canvas card" aria-label="Delete card"><svg viewBox="0 0 20 20"><path d="M4 6h12M8 6V4h4v2M6 6l.7 10h6.6L14 6M8.5 9v4M11.5 9v4"/></svg></button>
+            <button class="tool-button" id="toggle-toolbar" title="Show or hide toolbar" aria-label="Show or hide toolbar"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M3 8h14"/></svg></button>
+            <button class="tool-button" id="toggle-theme" title="Toggle light and dark" aria-label="Toggle appearance"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5v13a6.5 6.5 0 0 0 0-13Z"/></svg></button>
+          </div>
+          <label class="search-box"><svg viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><input type="search" id="search" placeholder="Search" aria-label="Search notes"></label>
+        </div>
+        <div class="workspace">
+          <aside class="sidebar glass-panel" id="sidebar">
+            <button class="folder-row" data-folder="Quick Notes"><span class="folder-symbol">ϟ</span>Quick Notes</button>
+            <button class="folder-row" data-folder="All iCloud"><span class="folder-symbol">▱</span>All iCloud</button>
+            <button class="folder-row active" data-folder="Notes"><span class="folder-symbol">▱</span>Notes</button>
+            <button class="folder-row" data-folder="Canvas"><span class="folder-symbol canvas-mark">〽</span>Canvas</button>
+            <div class="side-status"><i></i> Your notes stay yours</div>
+          </aside>
+          <section class="note-list glass-panel" id="note-list" aria-label="Notes list"><div class="list-items" id="notes"></div><div class="list-empty" id="empty-search">No notes found</div></section>
+          <section class="canvas-panel" id="canvas-panel" aria-label="Canvas workspace">
+            <div class="canvas-dots"></div>
+            <div class="canvas-instruction glass"><kbd>⌥</kbd> + drag to draw a free arrow</div>
+            <div class="canvas-space" id="canvas-space">
+              <svg class="connectors" id="connectors" aria-hidden="true"><defs><marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="none" stroke="currentColor" stroke-width="1.4"/></marker></defs></svg>
+              <div class="canvas-cards" id="canvas-cards"></div>
+            </div>
+            <div class="zoom-hud glass"><button id="hud-zoom-out" aria-label="Zoom out">−</button><span id="zoom-value">100%</span><button id="hud-zoom-in" aria-label="Zoom in">＋</button></div>
+          </section>
+          <section class="text-panel glass-panel hidden" id="text-panel"><div class="text-note-meta">NOTES <span id="text-date">Nov 6, 2026 at 10:24 AM</span></div><h3 contenteditable="true" id="text-title">A note to yourself</h3><div class="text-note-body" id="text-body" contenteditable="true"><p>Start with a thought, and see where it takes you.</p><p>When you need more room, turn it into a canvas.</p></div></section>
+        </div>
+        <div class="demo-toast" id="toast" role="status"></div>
+      </div>
+      <div class="demo-hint"><span>⌥</span> Hold Option and drag across the canvas to draw an arrow. It stays independent of every card.</div>
+    </section>
+
+    <section class="feature-section section-wrap" id="details"><div class="section-kicker">A FEW WAYS TO MAKE IT YOURS</div><div class="feature-grid">
+      <article class="feature-card"><div class="feature-visual folders-visual"><div class="folder-stack"><span>ϟ &nbsp; Quick Notes</span><span>▱ &nbsp; All iCloud</span><span class="selected">▱ &nbsp; Notes</span><span>〽 &nbsp; Canvas</span></div></div><div class="feature-text"><span class="feature-number">01 / KEEP IT CLOSE</span><h3>Folders for the everyday.</h3><p>Quick notes and longer thoughts live alongside one another, ready when you need them.</p></div></article>
+      <article class="feature-card"><div class="feature-visual mini-canvas-visual"><div class="mini-dot-grid"></div><div class="mini-note mini-one">This week’s tip.<br><small>Notesy Canvas.</small></div><div class="mini-note mini-two">A thought<br>worth keeping.</div><div class="mini-arrow">↘</div></div><div class="feature-text"><span class="feature-number">02 / MAKE A LITTLE PATH</span><h3>A canvas for the bigger picture.</h3><p>Move cards around freely. Draw an arrow with Option and leave it wherever it helps your thinking.</p></div></article>
+      <article class="feature-card"><div class="feature-visual controls-visual"><div class="control-pill glass"><span>▣</span><span>⌕</span><span>＋</span><span>⚙</span></div><div class="control-glow"></div><span class="control-caption">Every tool, close at hand.</span></div><div class="feature-text"><span class="feature-number">03 / MAKE IT YOUR SPACE</span><h3>Warm paper. Clear tools.</h3><p>Soft glass controls float above a quiet canvas, keeping attention on what you’re making.</p></div></article>
+    </div></section>
+
+    <section class="closing section-wrap"><div class="closing-flower">✳</div><div class="section-kicker">NOTESY FOR MAC</div><h2>Make a little room<br>for <em>your ideas.</em></h2><a href="#demo" class="button button-dark">Take another look <span>↑</span></a></section>
+  </main>
+  <footer><a class="brand footer-brand" href="#top"><img src="assets/notesy-icon.png" alt=""><span>Notesy</span></a><span>A calm place for notes and visual thinking.</span><a href="#top">Back to the top ↑</a></footer>
+  <script src="script.js"></script>
+</body>
+</html>
