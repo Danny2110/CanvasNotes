@@ -234,7 +234,16 @@ public final class LiquidGlassBoxView: NSView {
         delegate?.glassBox(self, didMoveTo: origin, snapped: snapped)
     }
 
-    public override func mouseUp(with event: NSEvent) { dragOffset = nil; resizeStart = nil }
+    public override func mouseUp(with event: NSEvent) {
+        // A card that was dragged should come back to the top; otherwise it
+        // sinks behind every card it passed over.
+        if dragOffset != nil || resizeStart != nil {
+            delegate?.glassBox(self, didMoveTo: frame.origin, snapped: false)
+        }
+        dragOffset = nil
+        resizeStart = nil
+        superview?.addSubview(self, positioned: .above, relativeTo: nil)
+    }
 
     public override func menu(for event: NSEvent) -> NSMenu? {
         let menu = NSMenu()
@@ -257,10 +266,21 @@ public final class LiquidGlassBoxView: NSView {
 
     public override func keyDown(with event: NSEvent) {
         if event.keyCode == 51 || event.keyCode == 117 {
-            deleteNote()
+            // Removing the focused card from inside its own key event can leave
+            // AppKit messaging a deallocated responder; delete on the next turn.
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.delegate?.glassBoxDidRequestDeletion(self)
+            }
         } else {
             super.keyDown(with: event)
         }
+    }
+
+    /// ⌘./Esc leaves the card's inline editor instead of bubbling to a default
+    /// cancel that can tear down the field editor underneath us.
+    public override func cancelOperation(_ sender: Any?) {
+        window?.makeFirstResponder(nil)
     }
 
     @objc private func deleteNote() { delegate?.glassBoxDidRequestDeletion(self) }

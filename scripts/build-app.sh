@@ -15,6 +15,16 @@ pkill -x Notesy 2>/dev/null || true
 
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/Notesy"
+
+# SwiftPM stamps the deployment target into LC_BUILD_VERSION as the SDK version
+# (sdk 14.0), which tells AppKit the app predates Liquid Glass and earns it the
+# legacy window chrome. Keep the macOS 14 minimum but declare the real SDK so
+# macOS 26+ draws the current chrome: glass traffic lights included.
+vtool -set-build-version macos 14.0 26.0 -replace \
+    -output "$APP/Contents/MacOS/Notesy.sdkfix" "$APP/Contents/MacOS/Notesy" >/dev/null
+mv "$APP/Contents/MacOS/Notesy.sdkfix" "$APP/Contents/MacOS/Notesy"
+chmod +x "$APP/Contents/MacOS/Notesy"
+
 cp "$ROOT/Notesy.icns" "$APP/Contents/Resources/AppIcon.icns"
 # Write Info.plist with icon reference
 cat > "$APP/Contents/Info.plist" <<'PLIST'

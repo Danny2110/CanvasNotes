@@ -72,6 +72,10 @@ final class NotesWorkspaceView: NSView, NSTableViewDataSource, NSTableViewDelega
     private var showsNotesList = true
     private var showsToolbar = true
     private var isUpdatingEditor = false
+    /// True only while `load()` is populating the model from disk. `save()` is
+    /// a no-op then, otherwise the first `didSet` writes an empty store back
+    /// over the file we just read.
+    private var isRestoring = false
 
     /// Ambient gradient behind every piece of chrome; gives the glass something to refract.
     private let backdrop = AmbientBackdropView()
@@ -104,6 +108,9 @@ final class NotesWorkspaceView: NSView, NSTableViewDataSource, NSTableViewDelega
     private let toolbarRevealButton = NSButton()
     private var newNoteButton: NSButton!
     private var listColumnWidth: CGFloat = 242
+    /// Guards `selectNote` against re-entry from `selectRowIndexes` while a
+    /// text field is finishing its edit.
+    private var isSelectingNote = false
 
     private var visibleNotes: [WorkspaceNote] {        notes.filter { note in
             let inFolder = selectedFolder == "All iCloud" || (selectedFolder == "Canvas" ? note.isCanvas : note.folder == selectedFolder)
@@ -299,43 +306,63 @@ final class NotesWorkspaceView: NSView, NSTableViewDataSource, NSTableViewDelega
     /// Lays out inside the glass bar's own bounds using Auto Layout for glass buttons.
     private func layoutToolbar() {
         let bar = toolbarGlass.frame
-        // Find glass surfaces (which wrap the buttons)
-        let glassButtons = toolbarContent.subviews.compactMap { $0 as? GlassSurfaceView }
-        // Left group: sidebar toggle, new folder, ellipsis (3 buttons)
-        let leftGlass = Array(glassButtons.prefix(3))
-        let side: CGFloat = 42
-        let step: CGFloat = 48
+        // One deterministic left-to-right pass. The old version anchored the
+        // center group, the right group and the canvas controls all from the
+        // right edge, so the canvas controls landed exactly on top of
+        // Share / Trash / Menu / Gear.
+        let side: CGFloat = 40
+        let gap: CGFloat = 6
         let buttonY = (bar.height - side) / 2
-        var x = 18 - bar.minX
-        for glass in leftGlass {
-            glass.frame = NSRect(x: x, y: buttonY, width: side, height: side)
-            x += step
-        }
-        folderHeader.frame = NSRect(x: x + 2, y: (bar.height - 24) / 2, width: 170, height: 24)
-        x += step // Space for new note button
-        // New note button
-        if let newNoteGlass = newNoteButton.superview as? GlassSurfaceView {
-            newNoteGlass.frame = NSRect(x: x, y: buttonY, width: side, height: side)
-        }
-        x += step
-        let flexible = toolbarContent.subviews.first(where: { !($0 is GlassSurfaceView) && $0 !== folderHeader && $0 !== searchField })
-        // Right side glass buttons (excluding canvas controls and search)
-        let canvasControlGlass = Set(canvasControlButtons.compactMap { $0.superview as? GlassSurfaceView })
-        let rightGlass = glassButtons.filter { !leftGlass.contains($0) && $0 !== newNoteButton.superview && !canvasControlGlass.contains($0) && $0 !== searchField.superview }
+
+        let allGlass = toolbarContent.subviews.compactMap { $0 as? GlassSurfaceView }
+        let leftGlass = Array(allGlass.prefix(3))
+        let newNoteGlass = newNoteButton.superview as? GlassSurfaceView
+        let canvasGlass = canvasControlButtons.compactMap { $0.superview as? GlassSurfaceView }
+        let canvasSet = Set(canvasGlass)
+        let otherGlass = allGlass.filter { !leftGlass.contains($0) && $0 !== newNoteGlass && !canvasSet.contains($0) }
+        let centerGlass = Array(otherGlass.prefix(4))
+        let rightGlass = Array(otherGlass.dropFirst(4))
+
         let searchWidth: CGFloat = min(280, max(180, bounds.width * 0.18))
-        searchField.frame = NSRect(x: bar.width - searchWidth - 14, y: (bar.height - 36) / 2, width: searchWidth, height: 36)
-        var rightX = searchField.frame.minX - 8
+        searchField.frame = NSRect(x: bar.width - searchWidth - 14, y: (bar.height - 36) / 2,
+                                   width: searchWidth, height: 36)
+
+        // Right edge -> left: search, right group, canvas controls, center group.
+        var x = searchField.frame.minX - gap
         for glass in rightGlass.reversed() {
-            rightX -= side
-            glass.frame = NSRect(x: rightX, y: buttonY, width: side, height: side)
-            rightX -= (step - side)
+            x -= side
+            glass.frame = NSRect(x: x, y: buttonY, width: side, height: side)
+            x -= gap
         }
-        // Canvas control buttons
-        for (i, glass) in canvasControlGlass.enumerated() {
-            let cx = bar.width - searchWidth - 14 - CGFloat(i + 1) * step - 8
-            glass.frame = NSRect(x: cx, y: buttonY, width: side, height: side)
+        for glass in canvasGlass.reversed() {
+            x -= side
+            glass.frame = NSRect(x: x, y: buttonY, width: side, height: side)
+            x -= gap
         }
-        if let flexible { flexible.frame = NSRect(x: x + 12, y: 0, width: max(8, rightX - x - 24), height: 1) }
+        let centerEndX = x
+        for glass in centerGlass.reversed() {
+            x -= side
+            glass.frame = NSRect(x: x, y: buttonY, width: side, height: side)
+            x -= gap
+        }
+
+        // Left edge -> right: sidebar, new folder, ellipsis, folder header, new note.
+        var lx: CGFloat = 18 - bar.minX
+        for glass in leftGlass {
+            glass.frame = NSRect(x: lx, y: buttonY, width: side, height: side)
+            lx += side + gap
+        }
+        folderHeader.frame = NSRect(x: lx + 2, y: (bar.height - 24) / 2, width: 150, height: 24)
+        lx += 150 + gap
+        if let newNoteGlass {
+            newNoteGlass.frame = NSRect(x: lx, y: buttonY, width: side, height: side)
+            lx += side + gap
+        }
+
+        let flexible = toolbarContent.subviews.first(where: { !($0 is GlassSurfaceView) && $0 !== folderHeader && $0 !== searchField })
+        if let flexible {
+            flexible.frame = NSRect(x: lx + 8, y: 0, width: max(8, centerEndX - lx - 16), height: 1)
+        }
     }
 
     private func configureSidebar() {
@@ -748,6 +775,9 @@ final class NotesWorkspaceView: NSView, NSTableViewDataSource, NSTableViewDelega
     }
 
     private func selectNote(_ id: UUID) {
+        guard !isSelectingNote else { return }
+        isSelectingNote = true
+        defer { isSelectingNote = false }
         selectedNoteID = id
         if let index = visibleNotes.firstIndex(where: { $0.id == id }) { notesTable.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false) }
         guard let note = selectedNote else { showEmptyEditor(); return }
@@ -833,8 +863,14 @@ final class NotesWorkspaceView: NSView, NSTableViewDataSource, NSTableViewDelega
     }
 
     func textDidEndEditing(_ notification: Notification) {
-        notesTable.reloadData()
-        if let selectedNoteID { selectNote(selectedNoteID) }
+        // Ending an edit is delivered while AppKit is still tearing down the
+        // field editor. Rebuilding the note UI synchronously here can reach a
+        // half-destroyed editor (the ⌘. crash), so hop to the next turn.
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.notesTable.reloadData()
+            if let id = self.selectedNoteID { self.selectNote(id) }
+        }
     }
 
     func controlTextDidChange(_ notification: Notification) {
@@ -847,8 +883,23 @@ final class NotesWorkspaceView: NSView, NSTableViewDataSource, NSTableViewDelega
     }
 
     func controlTextDidEndEditing(_ notification: Notification) {
-        notesTable.reloadData()
-        if let selectedNoteID { selectNote(selectedNoteID) }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.notesTable.reloadData()
+            if let id = self.selectedNoteID { self.selectNote(id) }
+        }
+    }
+
+    /// ⌘. is AppKit's cancel. Without an override it falls through to the
+    /// default responder while the inline editor is live; end the edit on the
+    /// next turn instead so the field editor is never rebuilt mid-teardown.
+    override func cancelOperation(_ sender: Any?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if self.window?.firstResponder is NSTextView {
+                self.window?.makeFirstResponder(nil)
+            }
+        }
     }
 
 
@@ -865,6 +916,8 @@ final class NotesWorkspaceView: NSView, NSTableViewDataSource, NSTableViewDelega
     }
 
     private func load() {
+        isRestoring = true
+        defer { isRestoring = false }
         if let data = try? Data(contentsOf: storeURL), let saved = try? JSONDecoder().decode(SavedNotes.self, from: data) {
             notes = saved.notes
             folders = saved.folders
@@ -905,12 +958,14 @@ final class NotesWorkspaceView: NSView, NSTableViewDataSource, NSTableViewDelega
     }
 
     private func save() {
-        guard isViewLoaded else { return }
+        guard !isRestoring, isViewLoaded else { return }
         let data = try? JSONEncoder().encode(SavedNotes(notes: notes, folders: folders))
         try? data?.write(to: storeURL, options: .atomic)
     }
 
-    private var isViewLoaded: Bool { window != nil || !subviews.isEmpty }
+    /// True once this view is actually inside a window. Before that, `save()`
+    /// would write an empty store back over the file we just loaded.
+    private var isViewLoaded: Bool { window != nil }
 
     // MARK: - Public menu actions
 

@@ -228,6 +228,16 @@ public final class HapticCanvasView: PaperCanvasView, LiquidGlassBoxViewDelegate
         needsDisplay = true
     }
 
+    /// ⌘. cancels the in-progress free arrow instead of falling through to
+    /// AppKit's default cancel handling.
+    public override func cancelOperation(_ sender: Any?) {
+        if pendingFreeArrowStart != nil {
+            cancelFreeArrow()
+            return
+        }
+        super.cancelOperation(sender)
+    }
+
     public func glassBox(_ box: LiquidGlassBoxView, didMoveTo origin: NSPoint, snapped: Bool) {
         setNeedsConnectionRedraw()
         notifyCanvasChanged()
